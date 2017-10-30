@@ -1,34 +1,27 @@
 package main
 
 import(
-	"golang.org/x/net/context"
-	_"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
 	"fmt"
-	_"google.golang.org/api/googleapi/transport"
 	"io/ioutil"
-	_"google.golang.org/api/option"
+	"./auth"
 )
 func main() {
-	ctx := context.Background()
-	jsonKey, err := ioutil.ReadFile("kuber-4e4ff93dd8f5.json")
+	jsonKey, err := ioutil.ReadFile("kuber-4e4ff93dd8f5.json");
 	if err != nil {
 		//return nil, err
 
 		fmt.Println(err)
 	}
-	conf, err := google.JWTConfigFromJSON(
-		jsonKey,
-		"https://www.googleapis.com/auth/compute",
-	)
+	client, err := auth.GetClient(jsonKey,"https://www.googleapis.com/auth/compute");
 	if err != nil {
 		//return nil, err
+
 		fmt.Println(err)
 	}
 
 
-	client := conf.Client(ctx);
+
 
 	computeService,err:=compute.New(client)
 
@@ -46,7 +39,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("%d",instance.Id)
+	fmt.Println(instance.Kind)
 
 
 }
