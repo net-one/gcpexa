@@ -1,0 +1,12 @@
+syntax="proto3";
+
+service Instance {
+	rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {}
+}
+message CreateInstanceRequest{
+    string instanceName=1;
+}
+
+message CreateInstanceResponse{
+    string instanceName=1;
+}
