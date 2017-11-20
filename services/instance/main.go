@@ -4,15 +4,10 @@ import(
 	"log"
 	micro "github.com/micro/go-micro"
 	proto "github.com/gcpexa/services/instance/proto"
-	"golang.org/x/net/context"	
+	repo "github.com/gcpexa/services/instance/repositories"
+	instanceService "github.com/gcpexa/services/instance/service"
 )
 
-type Instance struct {}
-
-func(i *Instance) CreateInstance(ctx context.Context,req *proto.CreateInstanceRequest,res *proto.CreateInstanceResponse) error{
-	res.InstanceName="instance-1"
-	return nil
-}
 
 
 func main(){
@@ -23,7 +18,9 @@ func main(){
 
 	service.Init()
 
-	proto.RegisterInstanceHandler(service.Server(),new (Instance))
+	companyRepo:=repo.NewCompanyRepository()
+	instance:=instanceService.NewInstance(companyRepo)
+	proto.RegisterInstanceHandler(service.Server(),instance)
 
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

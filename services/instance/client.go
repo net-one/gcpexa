@@ -15,7 +15,7 @@ func main() {
 
 	instance := proto.NewInstanceClient("instance", service.Client())
 
-	res, err := instance.CreateInstance(context.TODO(), &proto.CreateInstanceRequest{InstanceName: ""})
+	res, err := instance.CreateInstance(context.TODO(), &proto.CreateInstanceRequest{InstanceName: "",CompanyId:1})
 	if err != nil {
 		fmt.Println(err)
 	}

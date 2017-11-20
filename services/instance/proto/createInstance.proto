@@ -5,6 +5,7 @@ service Instance {
 }
 message CreateInstanceRequest{
     string instanceName=1;
+    int32  companyId=2;
 }
 
 message CreateInstanceResponse{

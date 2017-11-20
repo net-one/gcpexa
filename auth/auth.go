@@ -2,10 +2,10 @@ package auth
 import(
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
-	"net/http"
+	 "google.golang.org/api/compute/v1"	
 )
 
-func GetClient(jsonKey []byte,scope ...string)(*http.Client,error){
+func GetComputeService(jsonKey []byte,scope ...string)(*compute.Service,error){
 	ctx := context.Background()
 	
 	conf, err := google.JWTConfigFromJSON(jsonKey,scope...)
@@ -15,6 +15,12 @@ func GetClient(jsonKey []byte,scope ...string)(*http.Client,error){
 
 	client := conf.Client(ctx);
 
-	return client,nil
+	computeService,err:=compute.New(client)
+	
+		if err != nil {
+			return nil, err
+		}
+
+	return computeService,nil
 }
 
