@@ -14,7 +14,7 @@ func NewCompanyRepository()*CompanyRepository{
 
 func (c *CompanyRepository) GetKey(companyId int32)([]byte, error){
 
-	key, err := ioutil.ReadFile("../../../k.json");
+	key, err := ioutil.ReadFile("k.json");
 	if err != nil {
 		return nil, err
 	}

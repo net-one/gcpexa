@@ -4,8 +4,75 @@ service Instance {
 	rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {}
 }
 message CreateInstanceRequest{
-    string instanceName=1;
-    int32  companyId=2;
+     int32  companyId=1;
+     string project=2;
+     string zone=3;
+     string requestId=4;
+     string instanceName=5;
+     string minCpuPlatform=6;
+     string machineType=7;
+
+     map<string,string> metadata = 8;
+
+
+  message TAGS {
+    repeated string items = 1;
+  }
+
+   TAGS tags = 9;
+
+     
+    message DISKS {
+     string type =1;
+     bool boot =2;
+     string mode = 3;
+     bool autoDelete =4;
+     string deviceName = 5;
+
+    message INITIALIZEPARAMS {
+       string sourceImage = 1;
+       string diskType = 2;
+       int64 diskSizeGb = 3;
+    }
+
+     INITIALIZEPARAMS initializeParams = 6;
+  }
+
+  repeated DISKS disks=10;
+     bool canIpForward = 11;
+
+
+    message NETWORKINTERFACES {
+     string network = 1;
+     string subnetwork = 2;
+
+    message ACCESSCONFIGS {
+       string name = 1;
+       string type = 2;
+    }
+
+    message ALIASIPRANGES{
+        string ipCidrRange=1;
+        string subnetworkRangeName=2;
+    }
+
+    repeated ACCESSCONFIGS accessConfigs = 3;
+    repeated ALIASIPRANGES aliasIpRanges = 4;
+  }
+
+  repeated NETWORKINTERFACES networkInterfaces = 12;
+  string description = 13;
+  map<string,string> labels = 14;
+
+    message SCHEDULING {
+     bool preemptible = 1;
+     string onHostMaintenance = 2;
+     bool automaticRestart = 3;
+  }
+
+   SCHEDULING scheduling = 15;
+
+
 }
 
 message CreateInstanceResponse{

@@ -1,26 +1,24 @@
 package main
 
-import(
-	"log"
-	micro "github.com/micro/go-micro"
+import (
 	proto "github.com/gcpexa/services/instance/proto"
 	repo "github.com/gcpexa/services/instance/repositories"
 	instanceService "github.com/gcpexa/services/instance/service"
+	micro "github.com/micro/go-micro"
+	"log"
 )
 
+func main() {
 
-
-func main(){
-
-	service:=micro.NewService(
+	service := micro.NewService(
 		micro.Name("instance"),
 	)
 
 	service.Init()
 
-	companyRepo:=repo.NewCompanyRepository()
-	instance:=instanceService.NewInstance(companyRepo)
-	proto.RegisterInstanceHandler(service.Server(),instance)
+	companyRepo := repo.NewCompanyRepository()
+	instance := instanceService.NewInstance(companyRepo)
+	proto.RegisterInstanceHandler(service.Server(), instance)
 
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
