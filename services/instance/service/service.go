@@ -28,14 +28,15 @@ func (inst *instance) CreateInstance(ctx context.Context, req *proto.CreateInsta
 	if err != nil {
 		return err
 	}
-	 instanceInfo := compute.Instance{}
+
+	instanceInfo := compute.Instance{}
 	instanceInfo.Name = req.InstanceName
 	instanceInfo.MinCpuPlatform = req.MinCpuPlatform
 	instanceInfo.MachineType = req.MachineType
 	n := len(req.Metadata)
 
 	if n > 0 {
-		instanceInfo.Metadata.Items = make([]*compute.MetadataItems, n, 2*n)
+		instanceInfo.Metadata.Items = make([]*compute.MetadataItems, n)
 
 		var i int32
 		i = 0
@@ -46,24 +47,24 @@ func (inst *instance) CreateInstance(ctx context.Context, req *proto.CreateInsta
 		}
 	}
 
-	if(req.Tags!=nil){
-	instanceInfo.Tags.Items = req.Tags.Items
+	if req.Tags != nil {
+		instanceInfo.Tags.Items = req.Tags.Items
 	}
 
 	m := len(req.Disks)
 
 	if m > 0 {
-		instanceInfo.Disks = make([]*compute.AttachedDisk, m, 2*m)
+		instanceInfo.Disks = make([]*compute.AttachedDisk, m)
 
 		for i := 0; i < m; i++ {
-			instanceInfo.Disks[i]=&compute.AttachedDisk{}
+			instanceInfo.Disks[i] = &compute.AttachedDisk{}
 			instanceInfo.Disks[i].Type = req.Disks[i].Type
 			instanceInfo.Disks[i].Boot = req.Disks[i].Boot
 			instanceInfo.Disks[i].Mode = req.Disks[i].Mode
 			instanceInfo.Disks[i].AutoDelete = req.Disks[i].AutoDelete
 			instanceInfo.Disks[i].DeviceName = req.Disks[i].DeviceName
 
-			instanceInfo.Disks[i].InitializeParams=&compute.AttachedDiskInitializeParams{}
+			instanceInfo.Disks[i].InitializeParams = &compute.AttachedDiskInitializeParams{}
 			instanceInfo.Disks[i].InitializeParams.SourceImage = req.Disks[i].InitializeParams.SourceImage
 			instanceInfo.Disks[i].InitializeParams.DiskType = req.Disks[i].InitializeParams.DiskType
 			instanceInfo.Disks[i].InitializeParams.DiskSizeGb = req.Disks[i].InitializeParams.DiskSizeGb
@@ -78,15 +79,15 @@ func (inst *instance) CreateInstance(ctx context.Context, req *proto.CreateInsta
 		instanceInfo.NetworkInterfaces = make([]*compute.NetworkInterface, p, 2*p)
 
 		for i := 0; i < p; i++ {
-			instanceInfo.NetworkInterfaces[i]=&compute.NetworkInterface{}
+			instanceInfo.NetworkInterfaces[i] = &compute.NetworkInterface{}
 			instanceInfo.NetworkInterfaces[i].Network = req.NetworkInterfaces[i].Network
 			instanceInfo.NetworkInterfaces[i].Subnetwork = req.NetworkInterfaces[i].Subnetwork
 			q := len(req.NetworkInterfaces[i].AccessConfigs)
 
 			if q > 0 {
-				instanceInfo.NetworkInterfaces[i].AccessConfigs=make([]*compute.AccessConfig,q)
+				instanceInfo.NetworkInterfaces[i].AccessConfigs = make([]*compute.AccessConfig, q)
 				for j := 0; j < q; j++ {
-					instanceInfo.NetworkInterfaces[i].AccessConfigs[j]=&compute.AccessConfig{}
+					instanceInfo.NetworkInterfaces[i].AccessConfigs[j] = &compute.AccessConfig{}
 					instanceInfo.NetworkInterfaces[i].AccessConfigs[j].Name = req.NetworkInterfaces[i].AccessConfigs[j].Name
 					instanceInfo.NetworkInterfaces[i].AccessConfigs[j].Type = req.NetworkInterfaces[i].AccessConfigs[j].Type
 				}
@@ -95,10 +96,10 @@ func (inst *instance) CreateInstance(ctx context.Context, req *proto.CreateInsta
 			r := len(req.NetworkInterfaces[i].AliasIpRanges)
 
 			if r > 0 {
-				instanceInfo.NetworkInterfaces[i].AliasIpRanges=make([]*compute.AliasIpRange,r)
-				
+				instanceInfo.NetworkInterfaces[i].AliasIpRanges = make([]*compute.AliasIpRange, r)
+
 				for k := 0; k < r; k++ {
-					instanceInfo.NetworkInterfaces[i].AliasIpRanges[k]=&compute.AliasIpRange{}
+					instanceInfo.NetworkInterfaces[i].AliasIpRanges[k] = &compute.AliasIpRange{}
 					instanceInfo.NetworkInterfaces[i].AliasIpRanges[k].IpCidrRange = req.NetworkInterfaces[i].AliasIpRanges[k].IpCidrRange
 					instanceInfo.NetworkInterfaces[i].AliasIpRanges[k].SubnetworkRangeName = req.NetworkInterfaces[i].AliasIpRanges[k].SubnetworkRangeName
 				}
@@ -109,24 +110,63 @@ func (inst *instance) CreateInstance(ctx context.Context, req *proto.CreateInsta
 
 	instanceInfo.Description = req.Description
 	instanceInfo.Labels = req.Labels
-	instanceInfo.Scheduling=&compute.Scheduling{}
+	instanceInfo.Scheduling = &compute.Scheduling{}
 	instanceInfo.Scheduling.Preemptible = req.Scheduling.Preemptible
 	instanceInfo.Scheduling.OnHostMaintenance = req.Scheduling.OnHostMaintenance
 	instanceInfo.Scheduling.AutomaticRestart = &req.Scheduling.AutomaticRestart
 
-	_,err=computeClient.Instances.Insert(req.Project, req.Zone, &instanceInfo).Do()
+	_, err = computeClient.Instances.Insert(req.Project, req.Zone, &instanceInfo).Do()
 
-	
 	if err != nil {
 		return err
 	}
 
-	instanceResponse,err:=computeClient.Instances.Get(req.Project, req.Zone,instanceInfo.Name).Do()
+	instanceResponse, err := computeClient.Instances.Get(req.Project, req.Zone, instanceInfo.Name).Do()
 
 	if err != nil {
 		return err
 	}
 	res.InstanceName = instanceResponse.Name
+	return nil
+}
+
+func (inst *instance) DeleteInstance(ctx context.Context, req *proto.DeleteInstanceRequest, res *proto.DeleteInstanceResponse) error {
+	key, err := inst.companyRepo.GetKey(req.CompanyId)
+
+	if err != nil {
+		return err
+	}
+
+	computeClient, err := auth.GetComputeService(key, "https://www.googleapis.com/auth/compute")
+
+	instanceResponse, err := computeClient.Instances.Delete(req.Project, req.Zone, req.InstanceName).Do()
+
+	if err != nil {
+		return err
+	}
+
+	res.Status = instanceResponse.Status
+	res.HttpErrorStatusCode = instanceResponse.HttpErrorStatusCode
+	res.HttpErrorMessage = instanceResponse.HttpErrorMessage
+	res.HttpStatusCode = int64(instanceResponse.HTTPStatusCode)
+
+	if instanceResponse.Error != nil {
+		errorCount := len(instanceResponse.Error.Errors)
+
+		if errorCount > 0 {
+			res.Errors = make([]*proto.DeleteInstanceResponse_ERRORS, errorCount)
+			for i, v := range instanceResponse.Error.Errors {
+
+				res.Errors[i] = &proto.DeleteInstanceResponse_ERRORS{}
+				res.Errors[i].Code = v.Code
+				res.Errors[i].Location = v.Location
+				res.Errors[i].Message = v.Message
+
+			}
+		}
+
+	}
+
 	return nil
 }
 

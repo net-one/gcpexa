@@ -2,6 +2,7 @@ syntax="proto3";
 
 service Instance {
 	rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {}
+  rpc DeleteInstance(DeleteInstanceRequest) returns(DeleteInstanceResponse) {}
 }
 message CreateInstanceRequest{
      int32  companyId=1;
@@ -77,4 +78,26 @@ message CreateInstanceRequest{
 
 message CreateInstanceResponse{
     string instanceName=1;
+}
+
+message DeleteInstanceRequest{
+  int32  companyId=1;
+  string project=2;
+  string zone=3;
+  string instanceName=4;
+}
+
+message DeleteInstanceResponse{
+  string status=1;
+  int64 httpStatusCode=2;
+  int64 httpErrorStatusCode=3;
+  string httpErrorMessage=4;
+  
+  message ERRORS{
+    string code=1;
+    string location=2;
+    string message=3;
+  }
+
+  repeated ERRORS errors=5;
 }
