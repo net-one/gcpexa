@@ -170,6 +170,30 @@ func (inst *instance) DeleteInstance(ctx context.Context, req *proto.DeleteInsta
 	return nil
 }
 
+
+func (inst *instance) GetInstance(ctx context.Context, req *proto.GetInstanceRequest, res *proto.GetInstanceResponse) error {
+	key, err := inst.companyRepo.GetKey(req.CompanyId)
+
+	if err != nil {
+		return err
+	}
+
+	computeClient, err := auth.GetComputeService(key, "https://www.googleapis.com/auth/compute")
+
+	instanceResponse, err := computeClient.Instances.Get(req.Project, req.Zone, req.InstanceName).Do()
+
+	if err != nil {
+		return err
+	}
+
+	res.Status = instanceResponse.Status
+	res.Id=instanceResponse.Id
+	res.Name=instanceResponse.Name
+	res.Preemptible=instanceResponse.Scheduling.Preemptible
+
+	return nil
+}
+
 type companyRepository interface {
 	GetKey(companyId int32) ([]byte, error)
 }

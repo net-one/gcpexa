@@ -9,8 +9,35 @@ import (
 
 func main() {
 
+	//createInstance()
+	//getInstance()
 	deleteInstance()
 }
+
+func getInstance() {
+	service := micro.NewService(micro.Name("instance.client"))
+
+	instance := proto.NewInstanceClient("instance", service.Client())
+
+	req := &proto.GetInstanceRequest{}
+	req.CompanyId = 1
+	req.InstanceName = "new-instance"
+	req.Zone = "us-central1-c"
+	req.Project = "kuber-180507"
+
+	res, err := instance.GetInstance(context.TODO(), req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(res.Status)
+	fmt.Println(res.Id)
+	fmt.Println(res.Name)
+	fmt.Println(res.Preemptible)
+
+}
+
 
 func deleteInstance() {
 	service := micro.NewService(micro.Name("instance.client"))
@@ -19,7 +46,7 @@ func deleteInstance() {
 
 	req := &proto.DeleteInstanceRequest{}
 	req.CompanyId = 1
-	req.InstanceName = "instance-1"
+	req.InstanceName = "new-instance"
 	req.Zone = "us-central1-c"
 	req.Project = "kuber-180507"
 
