@@ -1,7 +1,7 @@
 package service
 
 import (
-	auth "github.com/gcpexa/auth"
+	auth "github.com/gcpexa/services/instance/auth"
 	proto "github.com/gcpexa/services/instance/proto"
 	"golang.org/x/net/context"
 	compute "google.golang.org/api/compute/v1"

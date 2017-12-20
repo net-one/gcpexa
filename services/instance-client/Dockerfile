@@ -1,6 +1,6 @@
 FROM golang:1.8.1 as builder
 
-WORKDIR /go/src/github.com/gcpexa/services/instance
+WORKDIR /go/src/github.com/net-one/gcpexa/services/instance-client
 
 COPY . .
 
@@ -13,6 +13,6 @@ FROM alpine:latest
 
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /go/src/github.com/gcpexa/services/instance .
+COPY --from=builder /go/src/github.com/net-one/gcpexa/services/instance-client .
 
-CMD ["./instance"]
+CMD ["./instance-client"]

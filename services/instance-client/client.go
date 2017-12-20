@@ -2,19 +2,23 @@ package main
 
 import (
 	"fmt"
-	proto "github.com/gcpexa/services/instance/proto"
+	proto "github.com/net-one/gcpexa/services/instance/proto"
 	micro "github.com/micro/go-micro"
+	"github.com/micro/go-micro/cmd"	
 	"golang.org/x/net/context"
 )
 
 func main() {
-
+	cmd.Init()
+	
 	//createInstance()
 	//getInstance()
 	deleteInstance()
 }
 
 func getInstance() {
+
+
 	service := micro.NewService(micro.Name("instance.client"))
 
 	instance := proto.NewInstanceClient("instance", service.Client())
